@@ -1,1 +1,0 @@
-# tripwhiz-ai
