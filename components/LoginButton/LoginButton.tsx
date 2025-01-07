@@ -1,6 +1,6 @@
 "use client";
 
-import { signInWithGoogle } from "@/supabase/supabaseFunctions";
+import { signInWithGoogle } from "@/supabase/googleAuthFunction";
 import { Button } from "../Button/button";
 
 const LoginButton = () => {

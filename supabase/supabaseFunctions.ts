@@ -1,23 +1,30 @@
-import { redirect } from "next/navigation";
-import { createClient } from "./client";
+"use server";
 
-export const signInWithGoogle = async (options?: { redirectPath?: string }) => {
+import { createClient } from "./server";
+
+export const getUserProfile = async () => {
   try {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: options?.redirectPath
-          ? `${window.location.origin}/auth/callback?redirect_to=${options.redirectPath}`
-          : `${window.location.origin}/auth/callback`,
-      },
-    });
+    const supabase = await createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", session.user.id)
+      .single();
 
     if (error) {
-      redirect("/auth/error");
+      throw error;
     }
+
+    return data;
   } catch (error) {
-    console.error("Error signing in:", error);
-    redirect("/auth/error");
+    throw error;
   }
 };
