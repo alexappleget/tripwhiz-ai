@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Textarea } from "@/components/Textarea/textarea";
 
 const stepOneSchema = z.object({});
 
@@ -42,6 +43,13 @@ const stepTwoSchema = z.object({
   }),
 });
 
+const stepThreeSchema = z.object({
+  interests: z.string().min(2, {
+    message:
+      "I need a little more information about your interests to find the perfect vacation for you. Please share some activities or hobbies.",
+  }),
+});
+
 // Combined schema for the entire form
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const FormSchema = z.object({
@@ -50,6 +58,10 @@ const FormSchema = z.object({
   }),
   age: z.string().min(1, {
     message: "Please provide your age.",
+  }),
+  interests: z.string().min(2, {
+    message:
+      "I need a little more information about your interests to find the perfect vacation for you. Please share some activities or hobbies.",
   }),
 });
 
@@ -70,6 +82,12 @@ const steps: Step[] = [
     title: "About You",
     description: "First let's get to know each other",
     schema: stepTwoSchema,
+  },
+  {
+    title: "Your Interests",
+    description:
+      "Tell me about your interests so I can better tailor your next vacation. The more information you provide, the better I can assist you.",
+    schema: stepThreeSchema,
   },
 ];
 
@@ -96,6 +114,7 @@ const Onboarding = () => {
     defaultValues: {
       name: "",
       age: "",
+      interests: "",
     },
   });
 
@@ -106,6 +125,7 @@ const Onboarding = () => {
       setName(response.display_name);
       form.setValue("name", response.display_name);
       form.setValue("age", response.age);
+      form.setValue("interests", response.interests);
     };
 
     fetchUserProfile();
@@ -131,6 +151,7 @@ const Onboarding = () => {
         await updateUserProfile({
           age: formData.age,
           display_name: formData.name,
+          interests: formData.interests,
           onboarding_complete: true,
         });
 
@@ -209,6 +230,27 @@ const Onboarding = () => {
                         </FormItem>
                       )}
                     />
+                  </>
+                )}
+                {currentStep === 2 && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="interests"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tell me about your interests</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Share some of your favorite activities or hobbies. And even types of vacations you enjoyed."
+                              className="resize-none"
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    ></FormField>
                   </>
                 )}
               </CardContent>
