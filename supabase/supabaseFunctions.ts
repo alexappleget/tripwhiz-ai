@@ -32,9 +32,11 @@ export const getUserProfile = async () => {
 export const updateUserProfile = async ({
   age,
   display_name,
+  onboarding_complete,
 }: {
   age: string;
   display_name: string;
+  onboarding_complete: boolean;
 }) => {
   try {
     const supabase = await createClient();
@@ -48,7 +50,7 @@ export const updateUserProfile = async ({
 
     const { data, error } = await supabase
       .from("profiles")
-      .update({ age, display_name })
+      .update({ age, display_name, onboarding_complete })
       .eq("id", session.user.id)
       .select()
       .single();

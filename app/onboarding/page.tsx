@@ -126,19 +126,19 @@ const Onboarding = () => {
   const onSubmit = async () => {
     if (currentStep === steps.length - 1) {
       try {
-        const response = await updateUserProfile({
-          age: FormData.name,
-          display_name: FormData.name,
+        const formData = form.getValues();
+
+        await updateUserProfile({
+          age: formData.age,
+          display_name: formData.name,
+          onboarding_complete: true,
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to update profile.");
-        }
-
         setIsSubmitted(true);
+
         router.push("/dashboard");
       } catch (error) {
-        throw error;
+        console.error("Error updating profile:", error);
       }
     } else {
       next();
@@ -186,7 +186,7 @@ const Onboarding = () => {
                         <FormItem>
                           <FormLabel>What should I call you?</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} value={field.value || ""} />
                           </FormControl>
                           <FormDescription>
                             This is how I will best know what to call you
@@ -203,7 +203,7 @@ const Onboarding = () => {
                         <FormItem>
                           <FormLabel>What is your current age?</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} value={field.value || ""} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
