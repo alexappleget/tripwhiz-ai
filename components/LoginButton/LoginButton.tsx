@@ -13,7 +13,11 @@ const LoginButton = () => {
   };
 
   return (
-    <Button size="lg" onClick={signIn}>
+    <Button
+      className="bg-sky-500 hover:bg-sky-600 text-white text-lg px-8 py-3"
+      size="lg"
+      onClick={signIn}
+    >
       Sign In
     </Button>
   );

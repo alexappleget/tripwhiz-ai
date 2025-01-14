@@ -32,19 +32,13 @@ export const getUserProfile = async () => {
 export const updateUserProfile = async ({
   age,
   display_name,
-  gender,
-  disabilities,
   interests,
-  fears,
   foods,
   onboarding_complete,
 }: {
   age: string;
   display_name: string;
-  gender: string;
-  disabilities?: string;
   interests: string;
-  fears: string[];
   foods: string[];
   onboarding_complete: boolean;
 }) => {
@@ -63,10 +57,7 @@ export const updateUserProfile = async ({
       .update({
         age,
         display_name,
-        gender,
-        disabilities,
         interests,
-        fears,
         foods,
         onboarding_complete,
       })

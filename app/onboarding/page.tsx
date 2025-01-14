@@ -31,10 +31,6 @@ import { Suspense, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/Textarea/textarea";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/components/RadioGroup/radio-group";
 import { MultiSelect } from "@/components/MultiSelect/multi-select";
 
 const stepOneSchema = z.object({});
@@ -49,24 +45,13 @@ const stepTwoSchema = z.object({
 });
 
 const stepThreeSchema = z.object({
-  gender: z.enum(["male", "female", "other"], {
-    message: "Please specify your gender.",
-  }),
-  disabilities: z.string().optional().nullable(),
-});
-
-const stepFourSchema = z.object({
   interests: z.string().min(2, {
     message:
       "I need a little more information about your interests to find the perfect vacation for you. Please share some activities or hobbies.",
   }),
 });
 
-const stepFiveSchema = z.object({
-  fears: z.array(z.string()).optional().nullable(),
-});
-
-const stepSixSchema = z.object({
+const stepFourSchema = z.object({
   foods: z.array(z.string()).min(1, {
     message: "Please choose at least 1 food option",
   }),
@@ -81,15 +66,10 @@ const FormSchema = z.object({
   age: z.string().min(1, {
     message: "Please provide your age.",
   }),
-  gender: z.enum(["male", "female", "other"], {
-    message: "Please specify your gender.",
-  }),
-  disabilities: z.string().optional().nullable(),
   interests: z.string().min(2, {
     message:
       "I need a little more information about your interests to find the perfect vacation for you. Please share some activities or hobbies.",
   }),
-  fears: z.array(z.string()).optional().nullable(),
   foods: z.array(z.string()).min(1, {
     message: "Please choose at least 1 food option.",
   }),
@@ -114,37 +94,16 @@ const steps: Step[] = [
     schema: stepTwoSchema,
   },
   {
-    title: "Personal Information",
-    description:
-      "Please specify your gender and any disabilities you may have. This is to ensure that I can tailor vacation activities for you.",
-    schema: stepThreeSchema,
-  },
-  {
     title: "Your Interests",
     description:
       "Tell me about your interests so I can better tailor your next vacation. The more information you provide, the better I can assist you.",
-    schema: stepFourSchema,
-  },
-  {
-    title: "Fears",
-    description:
-      "Do you have any fears I should be aware of? I want to be sure to avoid anything based on your fears.",
-    schema: stepFiveSchema,
+    schema: stepThreeSchema,
   },
   {
     title: "Favorite Foods",
     description: "Tell me about what types of food you enjoy eating.",
-    schema: stepSixSchema,
+    schema: stepFourSchema,
   },
-];
-
-const fearOptions = [
-  { value: "acrophobia", label: "Acrophobia (Heights)" },
-  { value: "aerophobia", label: "Aerophobia (Flying)" },
-  { value: "arachnophobia", label: "Arachnophobia (Spiders)" },
-  { value: "claustrophobia", label: "Claustrophobia (Confined Spaces)" },
-  { value: "nyctophobia", label: "Nyctophobia (Dark)" },
-  { value: "ophidiophobia", label: "Ophidiophobia (Snakes)" },
 ];
 
 const foodOptions = [
@@ -179,10 +138,7 @@ const Onboarding = () => {
     defaultValues: {
       name: "",
       age: "",
-      gender: undefined,
-      disabilities: undefined,
       interests: "",
-      fears: [],
       foods: [],
     },
   });
@@ -194,10 +150,7 @@ const Onboarding = () => {
       setName(response.display_name);
       form.setValue("name", response.display_name);
       form.setValue("age", response.age);
-      form.setValue("gender", response.gender);
-      form.setValue("disabilities", response.disabilities);
       form.setValue("interests", response.interests);
-      form.setValue("fears", response.fears);
       form.setValue("foods", response.foods);
     };
 
@@ -224,10 +177,7 @@ const Onboarding = () => {
         await updateUserProfile({
           age: formData.age,
           display_name: formData.name,
-          gender: formData.gender,
-          disabilities: formData.disabilities || undefined,
           interests: formData.interests,
-          fears: formData.fears || [],
           foods: formData.foods || [],
           onboarding_complete: true,
         });
@@ -313,62 +263,6 @@ const Onboarding = () => {
                   <>
                     <FormField
                       control={form.control}
-                      name="gender"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Choose a Gender</FormLabel>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="male" />
-                                </FormControl>
-                                <FormLabel>Male</FormLabel>
-                              </FormItem>
-                              <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="female" />
-                                </FormControl>
-                                <FormLabel>Female</FormLabel>
-                              </FormItem>
-                              <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="other" />
-                                </FormControl>
-                                <FormLabel>Other</FormLabel>
-                              </FormItem>
-                            </RadioGroup>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="disabilities"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Do you have any disabilities?</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="(Optional): Any disabilities that you want me to take into consideration when creating your vacation."
-                              className="resize-none"
-                              {...field}
-                              value={field.value || ""}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-                {currentStep === 3 && (
-                  <>
-                    <FormField
-                      control={form.control}
                       name="interests"
                       render={({ field }) => (
                         <FormItem>
@@ -386,32 +280,7 @@ const Onboarding = () => {
                     />
                   </>
                 )}
-                {currentStep === 4 && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="fears"
-                      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>List of Common Fears</FormLabel>
-                          <Controller
-                            control={form.control}
-                            name="fears"
-                            render={({ field }) => (
-                              <MultiSelect
-                                options={fearOptions}
-                                value={field.value || []}
-                                onChange={field.onChange}
-                              />
-                            )}
-                          />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-                {currentStep === 5 && (
+                {currentStep === 3 && (
                   <>
                     <FormField
                       control={form.control}
