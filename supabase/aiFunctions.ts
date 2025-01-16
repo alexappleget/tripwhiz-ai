@@ -34,8 +34,11 @@ export const createVacation = async (
         - A creative title for the vacation.
         - A total price within the $${travelPreferences.budget} budget.
         - Estimated flight cost, including taxes, from the closest airport to Austin, TX.
-        - Hotel recommendations with nightly prices and total stay costs, including taxes.
-        - A detailed, day-by-day itinerary with a price estimate for each activity. Include activities that reflect the profile's interests and preferences.
+        - Hotel recommendation with estimated cost, including taxes.
+        - A detailed, day-by-day itinerary where:
+          - The first day is a travel day with limited activities, such as arrival, check-in, and a light exploration of the area.
+          - The last day is a travel day with minimal activities, such as packing, breakfast, and departure.
+          - The remaining days include activities reflecting the profile's interests and preferences.
         - Keep the over JSON structure similar to this format:
 
         {
@@ -53,8 +56,8 @@ export const createVacation = async (
               "name": "Hotel name here",
               "location": "Hotel location here",
               "nightlyPrice": "Nightly cost here",
-              "totalStayCost": "Total stay cost including taxes here",
-              "taxesIncluded": "Total taxes included here",
+              "taxes": "Total on hotel",
+              "totalStayCost": "Total hotel cost including taxes",
             }
           ],
           "itinerary": [
