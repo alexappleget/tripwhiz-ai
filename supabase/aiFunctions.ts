@@ -1,10 +1,17 @@
 "use server";
 
-import { openai } from "@/api/openAIConfig/config";
+import { openai } from "@/config/openAIConfig";
 import { createClient } from "./server";
 import { Profile } from "@/app/types/Profile";
+import { TravelPreferences } from "@/app/types/TravelPreferences";
 
-export const createVacation = async (profile: Profile) => {
+export const createVacation = async (
+  profile: Profile | null,
+  travelPreferences: TravelPreferences
+) => {
+  if (!profile) {
+    throw new Error("No profile was found.");
+  }
   try {
     const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan within the specified budget. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, and itinerary. The itinerary should be detailed with the day's activity, price estimates, and the day's description.
 
@@ -12,7 +19,7 @@ export const createVacation = async (profile: Profile) => {
         - Age: ${profile.age}
         - Interests: ${profile.interests}
         - Foods: ${profile.foods}
-        - Location: ${profile.location}
+        - Location: Austin, TX
 
         Travel Preferences:
         - Travel Month: ${travelPreferences.travelMonth}
@@ -26,9 +33,7 @@ export const createVacation = async (profile: Profile) => {
         Ensure the final result includes:
         - A creative title for the vacation.
         - A total price within the $${travelPreferences.budget} budget.
-        - Estimated flight cost, including taxes, from the closest airport to ${
-          profile.location
-        }.
+        - Estimated flight cost, including taxes, from the closest airport to Austin, TX.
         - Hotel recommendations with nightly prices and total stay costs, including taxes.
         - A detailed, day-by-day itinerary with a price estimate for each activity. Include activities that reflect the profile's interests and preferences.
         - Keep the over JSON structure similar to this format:
