@@ -47,6 +47,7 @@ const formSchema = z.object({
   travelMonth: z.string().min(3, {
     message: "Please provide a valid month",
   }),
+  destination: z.string().optional(),
 });
 
 export default function CreateVacation() {
@@ -62,6 +63,7 @@ export default function CreateVacation() {
       tripStyle: undefined,
       numberOfDays: 0,
       travelMonth: "",
+      destination: "",
     },
   });
 
@@ -260,6 +262,21 @@ export default function CreateVacation() {
                 render={({ field }) => (
                   <FormItem className="m-5">
                     <FormLabel>What month would you like to travel?</FormLabel>
+                    <FormControl>
+                      <Input className="w-4/5" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Optional Destination */}
+              <FormField
+                control={form.control}
+                name="destination"
+                render={({ field }) => (
+                  <FormItem className="m-5">
+                    <FormLabel>Destination (Optional):</FormLabel>
                     <FormControl>
                       <Input className="w-4/5" {...field} />
                     </FormControl>

@@ -107,12 +107,15 @@ const steps: Step[] = [
 ];
 
 const foodOptions = [
-  { value: "bbq", label: "BBQ" },
-  { value: "coffee", label: "Coffee" },
-  { value: "curry", label: "Curry" },
-  { value: "hot dogs", label: "Hot Dogs" },
-  { value: "pasta", label: "Pasta" },
-  { value: "tacos", label: "Tacos" },
+  { value: "american", label: "American" },
+  { value: "chinese", label: "Chinese" },
+  { value: "french", label: "French" },
+  { value: "indian", label: "Indian" },
+  { value: "italian", label: "Italian" },
+  { value: "japanese", label: "Japanese" },
+  { value: "korean", label: "Korean" },
+  { value: "mexican", label: "Mexican" },
+  { value: "thai", label: "Thai" },
 ];
 
 export default function OnboardingPage() {

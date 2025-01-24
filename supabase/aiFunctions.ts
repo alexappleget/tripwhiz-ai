@@ -30,6 +30,7 @@ export const createVacation = async (
         - Trip Style: ${travelPreferences.tripStyle}
         - Budget: $${travelPreferences.budget}
         - Number of Days: ${travelPreferences.numberOfDays}
+        - Destination?: ${travelPreferences.destination}
 
         Ensure the final result includes:
         - A creative title for the vacation.
@@ -114,13 +115,18 @@ export const createVacation = async (
         : [],
     };
 
-    const { error: vacationError } = await supabase.from("").insert({});
+    const { error: vacationError } = await supabase
+      .from("vacation_suggestions")
+      .insert({
+        profile_id: profile.id,
+        suggestion: cleanSuggestion,
+      });
 
     if (vacationError) {
       console.error("Failed to store the vacation:", vacationError);
     }
 
-    return cleanSuggestion;
+    return { success: true };
   } catch (error) {
     throw error;
   }

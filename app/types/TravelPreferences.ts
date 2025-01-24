@@ -6,4 +6,5 @@ export interface TravelPreferences {
   numberOfTravelers: number;
   tripStyle: string;
   travelMonth: string;
+  destination?: string;
 }
