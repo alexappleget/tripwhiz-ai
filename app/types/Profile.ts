@@ -1,6 +1,6 @@
 export interface Profile {
   id: string;
-  age: string;
+  age: number;
   display_name: string;
   interests: string[];
   foods: string[];

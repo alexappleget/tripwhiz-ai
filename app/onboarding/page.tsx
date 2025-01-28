@@ -39,7 +39,7 @@ const stepTwoSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  age: z.string().min(1, {
+  age: z.coerce.number().min(1, {
     message: "Please enter your age.",
   }),
 });
@@ -63,7 +63,7 @@ const FormSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  age: z.string().min(1, {
+  age: z.coerce.number().min(1, {
     message: "Please provide your age.",
   }),
   interests: z.string().min(2, {
@@ -140,7 +140,7 @@ const Onboarding = () => {
     resolver: zodResolver(steps[currentStep].schema),
     defaultValues: {
       name: "",
-      age: "",
+      age: 0,
       interests: "",
       foods: [],
     },
@@ -254,7 +254,11 @@ const Onboarding = () => {
                         <FormItem>
                           <FormLabel>What is your current age?</FormLabel>
                           <FormControl>
-                            <Input {...field} value={field.value || ""} />
+                            <Input
+                              {...field}
+                              value={field.value || 0}
+                              type="number"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

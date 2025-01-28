@@ -2,6 +2,32 @@
 
 import { createClient } from "./server";
 
+export const getVacation = async ({ id }: { id: string }) => {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    const { data } = await supabase
+      .from("vacation_suggestions")
+      .select()
+      .eq("id", id);
+
+    if (!data) {
+      throw new Error("Failed to fetch data.");
+    }
+
+    return data[0].suggestion;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getUserProfile = async () => {
   try {
     const supabase = await createClient();
@@ -36,7 +62,7 @@ export const updateUserProfile = async ({
   foods,
   onboarding_complete,
 }: {
-  age: string;
+  age: number;
   display_name: string;
   interests: string;
   foods: string[];

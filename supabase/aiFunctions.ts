@@ -14,62 +14,71 @@ export const createVacation = async (
     throw new Error("No profile was found.");
   }
   try {
-    const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan within the specified budget. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, and itinerary. The itinerary should be detailed with the day's activity, price estimates, and the day's description.
+    const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan with real-world, verifiable options only. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, itinerary, bestTravelDates, and a brief description.
 
-        Profile Information:
-        - Age: ${profile.age}
-        - Interests: ${profile.interests}
-        - Foods: ${profile.foods}
-        - Location: Austin, TX
+      Profile Information:
+      - Age: ${profile.age}
+      - Interests: ${profile.interests}
+      - Foods: ${profile.foods}
+      - Location: Austin, TX
 
-        Travel Preferences:
-        - Travel Month: ${travelPreferences.travelMonth}
-        - Climate Preference: ${travelPreferences.climatePreference}
-        - Travel Method: ${travelPreferences.travelMethod}
-        - Number of Travelers: ${travelPreferences.numberOfTravelers}
-        - Trip Style: ${travelPreferences.tripStyle}
-        - Budget: $${travelPreferences.budget}
-        - Number of Days: ${travelPreferences.numberOfDays}
-        - Destination?: ${travelPreferences.destination}
+      Travel Preferences:
+      - Budget: ${travelPreferences.budget}
+      - Travel Month: ${travelPreferences.travelMonth}
+      - Climate Preference: ${travelPreferences.climatePreference}
+      - Travel Method: ${travelPreferences.travelMethod}
+      - Number of Travelers: ${travelPreferences.numberOfTravelers}
+      - Trip Style: ${travelPreferences.tripStyle}
+      - Number of Days: ${travelPreferences.numberOfDays}
+      - Destination?: ${travelPreferences.destination}
 
-        Ensure the final result includes:
-        - A creative title for the vacation.
-        - A total price within the $${travelPreferences.budget} budget.
-        - Estimated flight cost, including taxes, from the closest airport to Austin, TX.
-        - Hotel recommendation with estimated cost, including taxes.
-        - A detailed, day-by-day itinerary where:
-          - The first day is a travel day with limited activities, such as arrival, check-in, and a light exploration of the area.
-          - The last day is a travel day with minimal activities, such as packing, breakfast, and departure.
-          - The remaining days include activities reflecting the profile's interests and preferences.
-        - Keep the over JSON structure similar to this format:
+      Ensure:
+      - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events.
+      - Only use real and available hotels, flights, and activities.
+      - If the suggested hotel or activity does not exist in reality, replace it with a valid alternative.
+      - Provide a creative, real vacation title.
+      - Include real cost estimates for flights and hotels from reputable sources.
+      - Add a brief description explaining why this vacation was chosen, particularly how it aligns with the user’s preferences and budget.
 
-        {
-          "title": "Your vacation title here",
-          "totalPrice": "Total cost here",
-          "flights": {
-            "from": "Departure City",
-            "to": "Destination City",
-            "roundTripCost": "Round trip flight cost here",
-            "taxes": "Taxes on flights here",
-            "totalFlightCost": "Total flight cost including taxes",
-          },
-          "hotels": {
-            "name": "Hotel name here",
-            "location": "Hotel location here",
-            "nightlyPrice": "Nightly cost here",
-            "taxes": "Total on hotel",
-            "totalStayCost": "Total hotel cost including taxes",
-          },
-          "itinerary": [
-            ${Array.from({ length: travelPreferences.numberOfDays }, (_, i) => {
+      Ensure the final result is structured as:
+
+      {
+        "title": "Your vacation title here",
+        "totalPrice": I will handle this calculation,
+        "flights": {
+          "from": "Departure City",
+          "to": "Destination City",
+          "roundTripCost": <Round trip flight cost as a number>,
+          "taxes": <Taxes on flights as a number>,
+          "totalFlightCost": <Total flight cost including taxes as a number>,
+        },
+        "hotels": {
+          "name": "Hotel name",
+          "location": "Hotel address with it's zipcode",
+          "phoneNumber": "Phone number for the hotel",
+          "nightlyPrice": <Nightly cost here as a number>,
+          "taxes": <Taxes on hotel as a number>,
+          "totalStayCost": <Total hotel cost including taxes as a number>,
+        },
+        "itinerary": [
+          ${Array.from(
+            { length: travelPreferences.numberOfDays ?? 0 },
+            (_, i) => {
               return `{
-                "day": ${i + 1},
-                "description": "Description of activities for day ${i + 1}",
-                "estimatedCost": "Cost estimate for day ${i + 1}"
+              "day": ${i + 1},
+              "description": "Description of activities for day ${i + 1}",
+              "estimatedCost": <Cost estimate for day ${i + 1}>
               }`;
-            }).join(",\n")}
-          ]
-        }
+            }
+          ).join(",\n")}
+        ],
+        "bestTravelDates": {
+          "start": "Suggested start date",
+          "end": "Suggested end date",
+          "reason": "A brief description of why these dates were chosen."
+        },
+        "vacationDescription": "A brief description of why this vacation was chosen.",
+      }
     `;
 
     const completion = await openai.chat.completions.create({
@@ -89,44 +98,63 @@ export const createVacation = async (
 
     const suggestion = JSON.parse(completion.choices[0].message.content || "");
 
+    const flightsTotal = Number(suggestion.flights.totalFlightCost);
+    const stayTotal = Number(suggestion.hotels.totalStayCost);
+    const itineraryTotal = suggestion.itinerary.reduce(
+      (acc: number, day: ItineraryDay) => {
+        return acc + Number(day.estimatedCost);
+      },
+      0
+    );
+    const totalPrice = flightsTotal + stayTotal + itineraryTotal;
+
     const cleanSuggestion: VacationSuggestion = {
       title: String(suggestion.title),
-      totalPrice: String(suggestion.totalPrice),
+      totalPrice: totalPrice,
       flights: {
         from: String(suggestion.flights.from),
         to: String(suggestion.flights.to),
-        roundTripCost: String(suggestion.flights.roundTripCost),
-        taxes: String(suggestion.flights.taxes),
-        totalFlightCost: String(suggestion.flights.totalFlightCost),
+        roundTripCost: Number(suggestion.flights.roundTripCost),
+        taxes: Number(suggestion.flights.taxes),
+        totalFlightCost: flightsTotal,
       },
       hotels: {
         name: String(suggestion.hotels.name),
         location: String(suggestion.hotels.location),
-        nightlyPrice: String(suggestion.hotels.nightlyPrice),
-        taxes: String(suggestion.hotels.taxes),
-        totalStayCost: String(suggestion.hotels.totalStayCost),
+        phoneNumber: String(suggestion.hotels.phoneNumber),
+        nightlyPrice: Number(suggestion.hotels.nightlyPrice),
+        taxes: Number(suggestion.hotels.taxes),
+        totalStayCost: stayTotal,
       },
       itinerary: Array.isArray(suggestion.itinerary)
         ? suggestion.itinerary.map((day: ItineraryDay) => ({
             day: Number(day.day),
             description: String(day.description),
-            estimatedCost: String(day.estimatedCost),
+            estimatedCost: Number(day.estimatedCost),
           }))
         : [],
+      bestTravelDates: {
+        start: String(suggestion.bestTravelDates.start),
+        end: String(suggestion.bestTravelDates.end),
+        reason: String(suggestion.bestTravelDates.reason),
+      },
+      vacationDescription: String(suggestion.vacationDescription),
     };
 
-    const { error: vacationError } = await supabase
+    const { data, error } = await supabase
       .from("vacation_suggestions")
       .insert({
         profile_id: profile.id,
         suggestion: cleanSuggestion,
-      });
+      })
+      .select()
+      .single();
 
-    if (vacationError) {
-      console.error("Failed to store the vacation:", vacationError);
+    if (error) {
+      throw new Error("Failed to store the vacation:", error);
     }
 
-    return { success: true };
+    return data.id;
   } catch (error) {
     throw error;
   }

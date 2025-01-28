@@ -1,29 +1,38 @@
 export interface FlightDetails {
   from: string;
   to: string;
-  roundTripCost: string;
-  taxes: string;
-  totalFlightCost: string;
+  roundTripCost: number;
+  taxes: number;
+  totalFlightCost: number;
 }
 
 export interface HotelDetails {
   name: string;
   location: string;
-  nightlyPrice: string;
-  taxes: string;
-  totalStayCost: string;
+  phoneNumber: string;
+  nightlyPrice: number;
+  taxes: number;
+  totalStayCost: number;
 }
 
 export interface ItineraryDay {
   day: number;
   description: string;
-  estimatedCost: string;
+  estimatedCost: number;
+}
+
+export interface TravelDates {
+  start: string;
+  end: string;
+  reason: string;
 }
 
 export interface VacationSuggestion {
   title: string;
-  totalPrice: string;
+  totalPrice: number;
   flights: FlightDetails;
   hotels: HotelDetails;
   itinerary: ItineraryDay[];
+  bestTravelDates: TravelDates;
+  vacationDescription: string;
 }

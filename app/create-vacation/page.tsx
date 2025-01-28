@@ -23,11 +23,15 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Profile } from "../types/Profile";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  budget: z.string().min(3, {
-    message: "Please enter a valid budget more than 100.",
-  }),
+  budget: z.enum(
+    ["More on the cheaper side", "Money isn't an issue", "Broke but boujee"],
+    {
+      message: "Please select your budget style.",
+    }
+  ),
   climatePreference: z.enum(["Colder", "Warmer"], {
     message: "Please select a climate preference.",
   }),
@@ -52,11 +56,12 @@ const formSchema = z.object({
 
 export default function CreateVacation() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      budget: "",
+      budget: undefined,
       climatePreference: undefined,
       travelMethod: undefined,
       numberOfTravelers: 0,
@@ -80,8 +85,8 @@ export default function CreateVacation() {
       throw new Error("Profile not found");
     }
     try {
-      const response = await createVacation(profile, travelPreferences);
-      console.log(response);
+      const id = await createVacation(profile, travelPreferences);
+      router.push(`/vacations/${id}`);
     } catch (error) {
       throw error;
     }
@@ -105,10 +110,33 @@ export default function CreateVacation() {
                 control={form.control}
                 name="budget"
                 render={({ field }) => (
-                  <FormItem className="m-5">
+                  <FormItem className="space-y-3 m-5">
                     <FormLabel>Budget:</FormLabel>
                     <FormControl>
-                      <Input className="w-4/5" {...field} />
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="More on the cheaper side" />
+                          </FormControl>
+                          <FormLabel>More on the Cheaper Side</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="Money isn't an issue" />
+                          </FormControl>
+                          <FormLabel>Money isn&apos;t an issue</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="Broke but boujee" />
+                          </FormControl>
+                          <FormLabel>Broke but Boujee</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -187,7 +215,12 @@ export default function CreateVacation() {
                   <FormItem className="m-5">
                     <FormLabel>Number of Travelers:</FormLabel>
                     <FormControl>
-                      <Input className="w-4/5" {...field} type="number" />
+                      <Input
+                        className="w-4/5"
+                        {...field}
+                        type="number"
+                        value={field.value ?? ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -248,7 +281,12 @@ export default function CreateVacation() {
                       How many days do you want your vacation?
                     </FormLabel>
                     <FormControl>
-                      <Input className="w-4/5" {...field} type="number" />
+                      <Input
+                        className="w-4/5"
+                        {...field}
+                        type="number"
+                        value={field.value ?? ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
