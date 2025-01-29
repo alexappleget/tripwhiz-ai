@@ -18,7 +18,8 @@ export interface HotelDetails {
 export interface ItineraryDay {
   day: number;
   description: string;
-  estimatedCost: number;
+  estimatedActivityCost: number;
+  estimatedTravelCost: number;
 }
 
 export interface TravelDates {

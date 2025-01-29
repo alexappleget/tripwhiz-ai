@@ -14,11 +14,13 @@ export const createVacation = async (
     throw new Error("No profile was found.");
   }
   try {
-    const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan with real-world, verifiable options only. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, itinerary, bestTravelDates, and a brief description.
+    const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan with real-world, verifiable options only. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, itinerary, bestTravelDates, and a brief description. Surprise the user with unique experiences they might not expect but still align with their preferences.
 
       Profile Information:
       - Age: ${profile.age}
-      - Interests: ${profile.interests}
+      - Interests: ${
+        profile.interests
+      }. Do not focus solely on one interest—create a well-balanced vacation that includes a mix of them.
       - Foods: ${profile.foods}
       - Location: Austin, TX
 
@@ -67,7 +69,10 @@ export const createVacation = async (
               return `{
               "day": ${i + 1},
               "description": "Description of activities for day ${i + 1}",
-              "estimatedCost": <Cost estimate for day ${i + 1}>
+              "estimatedActivityCost": <Cost estimate for day ${
+                i + 1
+              }'s activity>
+              "estimatedTravelCost": <Cost estimate for traveling from the hotel's address to the activity>
               }`;
             }
           ).join(",\n")}
@@ -102,7 +107,11 @@ export const createVacation = async (
     const stayTotal = Number(suggestion.hotels.totalStayCost);
     const itineraryTotal = suggestion.itinerary.reduce(
       (acc: number, day: ItineraryDay) => {
-        return acc + Number(day.estimatedCost);
+        return (
+          acc +
+          Number(day.estimatedActivityCost) +
+          Number(day.estimatedTravelCost)
+        );
       },
       0
     );
@@ -130,7 +139,8 @@ export const createVacation = async (
         ? suggestion.itinerary.map((day: ItineraryDay) => ({
             day: Number(day.day),
             description: String(day.description),
-            estimatedCost: Number(day.estimatedCost),
+            estimatedActivityCost: Number(day.estimatedActivityCost),
+            estimatedTravelCost: Number(day.estimatedTravelCost),
           }))
         : [],
       bestTravelDates: {
