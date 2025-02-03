@@ -31,9 +31,16 @@ export interface TravelDates {
 export interface VacationSuggestion {
   title: string;
   totalPrice: number;
-  flights: FlightDetails;
+  flights?: FlightDetails;
+  driving?: DrivingDetails;
   hotels: HotelDetails;
   itinerary: ItineraryDay[];
   bestTravelDates: TravelDates;
   vacationDescription: string;
+}
+
+export interface DrivingDetails {
+  distance: number;
+  fuelCost: number;
+  gasPricePerGallon: number;
 }

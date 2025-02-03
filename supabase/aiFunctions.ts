@@ -4,7 +4,12 @@ import { openai } from "@/config/openAIConfig";
 import { createClient } from "./server";
 import { Profile } from "@/app/types/Profile";
 import { TravelPreferences } from "@/app/types/TravelPreferences";
-import { ItineraryDay, VacationSuggestion } from "@/app/types/aiFunctionTypes";
+import {
+  DrivingDetails,
+  FlightDetails,
+  ItineraryDay,
+  VacationSuggestion,
+} from "@/app/types/aiFunctionTypes";
 
 export const createVacation = async (
   profile: Profile | null,
@@ -13,6 +18,16 @@ export const createVacation = async (
   if (!profile) {
     throw new Error("No profile was found.");
   }
+
+  const travelMethodInstructions = () => {
+    if (travelPreferences.travelMethod === "Fly") {
+      return "- Find real round-trip flights for the given budget. Provide the total cost including taxes.";
+    }
+    if (travelPreferences.travelMethod === "Drive") {
+      return "- Calculate the total driving cost based on gas mileage. Assume an average fuel economy of 25 miles per gallon and a gas price of $3.00 per gallon. Provide the estimated fuel cost and total driving distance.";
+    }
+  };
+
   try {
     const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan with real-world, verifiable options only. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, itinerary, bestTravelDates, and a brief description. Surprise the user with unique experiences they might not expect but still align with their preferences.
 
@@ -36,6 +51,7 @@ export const createVacation = async (
 
       Ensure:
       - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events.
+      - ${travelMethodInstructions}
       - Only use real and available hotels, flights, and activities.
       - If the suggested hotel or activity does not exist in reality, replace it with a valid alternative.
       - Provide a creative, real vacation title.
@@ -47,13 +63,26 @@ export const createVacation = async (
       {
         "title": "Your vacation title here",
         "totalPrice": I will handle this calculation,
-        "flights": {
-          "from": "Departure City",
-          "to": "Destination City",
-          "roundTripCost": <Round trip flight cost as a number>,
-          "taxes": <Taxes on flights as a number>,
-          "totalFlightCost": <Total flight cost including taxes as a number>,
-        },
+        ${
+          travelPreferences.travelMethod === "Fly" &&
+          `
+          "flights": {
+            "from": "Departure City",
+            "to": "Destination City",
+            "roundTripCost": <Round trip flight cost as a number>,
+            "taxes": <Taxes on flights as a number>,
+            "totalFlightCost": <Total flight cost including taxes as a number>,
+          },`
+        }
+        ${
+          travelPreferences.travelMethod === "Drive" &&
+          `
+          "driving": {
+            "distance": <total miles from user's location to the destination city>,
+            "fuelCost": <total fuel cost>,
+            "gasPricePerGallon": 3.00
+          },`
+        }
         "hotels": {
           "name": "Hotel name",
           "location": "Hotel address with it's zipcode",
@@ -103,7 +132,30 @@ export const createVacation = async (
 
     const suggestion = JSON.parse(completion.choices[0].message.content || "");
 
-    const flightsTotal = Number(suggestion.flights.totalFlightCost);
+    let totalTravelCost = 0;
+    let flightDetails: FlightDetails | undefined;
+    let drivingDetails: DrivingDetails | undefined;
+
+    if (travelPreferences.travelMethod === "Fly") {
+      totalTravelCost = Number(suggestion.flights.totalFlightCost);
+      flightDetails = {
+        from: String(suggestion.flights.from),
+        to: String(suggestion.flights.to),
+        roundTripCost: Number(suggestion.flights.roundTripCost),
+        taxes: Number(suggestion.flights.taxes),
+        totalFlightCost: Number(suggestion.flights.totalFlightCost),
+      };
+    }
+
+    if (travelPreferences.travelMethod === "Drive") {
+      totalTravelCost = Number(suggestion.driving.fuelCost);
+      drivingDetails = {
+        distance: Number(suggestion.driving.distance),
+        fuelCost: Number(suggestion.driving.fuelCost),
+        gasPricePerGallon: Number(suggestion.driving.gasPricePerGallon),
+      };
+    }
+
     const stayTotal = Number(suggestion.hotels.totalStayCost);
     const itineraryTotal = suggestion.itinerary.reduce(
       (acc: number, day: ItineraryDay) => {
@@ -115,18 +167,18 @@ export const createVacation = async (
       },
       0
     );
-    const totalPrice = flightsTotal + stayTotal + itineraryTotal;
+
+    const totalPrice = totalTravelCost + stayTotal + itineraryTotal;
 
     const cleanSuggestion: VacationSuggestion = {
       title: String(suggestion.title),
       totalPrice: totalPrice,
-      flights: {
-        from: String(suggestion.flights.from),
-        to: String(suggestion.flights.to),
-        roundTripCost: Number(suggestion.flights.roundTripCost),
-        taxes: Number(suggestion.flights.taxes),
-        totalFlightCost: flightsTotal,
-      },
+      ...(travelPreferences.travelMethod === "Fly" && {
+        flights: flightDetails,
+      }),
+      ...(travelPreferences.travelMethod === "Drive" && {
+        driving: drivingDetails,
+      }),
       hotels: {
         name: String(suggestion.hotels.name),
         location: String(suggestion.hotels.location),
