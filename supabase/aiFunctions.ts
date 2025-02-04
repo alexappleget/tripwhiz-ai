@@ -69,8 +69,8 @@ export const createVacation = async (
         "title": "Your vacation title here",
         "totalPrice": I will handle this calculation,
         ${
-          travelPreferences.travelMethod === "Fly" &&
-          `
+          travelPreferences.travelMethod === "Fly"
+            ? `
           "flights": {
             "from": "${profile.city}, ${profile.state}",
             "to": "Destination City",
@@ -78,16 +78,18 @@ export const createVacation = async (
             "taxes": <Taxes on flights as a number>,
             "totalFlightCost": <Total flight cost including taxes as a number>,
           },`
+            : ""
         }
         ${
-          travelPreferences.travelMethod === "Drive" &&
-          `
+          travelPreferences.travelMethod === "Drive"
+            ? `
           "driving": {
             "startingLocation": "${profile.city}, ${profile.state}",
             "distance": <total miles from user's location to the destination city>,
             "fuelCost": <total fuel cost>,
-            "gasPricePerGallon": 3.00
+            "gasPricePerGallon": 3,
           },`
+            : ""
         }
         "hotels": {
           "name": "Hotel name",
@@ -106,8 +108,8 @@ export const createVacation = async (
               "description": "Description of activities for day ${i + 1}",
               "estimatedActivityCost": <Cost estimate for day ${
                 i + 1
-              }'s activity>
-              "estimatedTravelCost": <Cost estimate for traveling from the hotel's address to the activity>
+              }'s activity>,
+              "estimatedTravelCost": <Cost estimate for traveling from the hotel's address to the activity>,
               }`;
             }
           ).join(",\n")}
@@ -115,7 +117,7 @@ export const createVacation = async (
         "bestTravelDates": {
           "start": "Suggested start date",
           "end": "Suggested end date",
-          "reason": "A brief description of why these dates were chosen."
+          "reason": "A brief description of why these dates were chosen.",
         },
         "vacationDescription": "A brief description of why this vacation was chosen.",
       }
