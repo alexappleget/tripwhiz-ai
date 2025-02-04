@@ -40,6 +40,7 @@ export interface VacationSuggestion {
 }
 
 export interface DrivingDetails {
+  startingLocation: string;
   distance: number;
   fuelCost: number;
   gasPricePerGallon: number;

@@ -37,7 +37,9 @@ export const createVacation = async (
         profile.interests
       }. Do not focus solely on one interest—create a well-balanced vacation that includes a mix of them.
       - Foods: ${profile.foods}
-      - Location: ${profile.city}, ${profile.state}
+      - Departure Location (MUST be used for all travel calculations): ${
+        profile.city
+      }, ${profile.state}
 
       Travel Preferences:
       - Budget: ${travelPreferences.budget}
@@ -52,6 +54,9 @@ export const createVacation = async (
       Ensure:
       - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events.
       - ${travelMethodInstructions}
+      - All travel plans, whether flights or driving, MUST use ${
+        profile.city
+      }, ${profile.state} as the starting location.
       - Only use real and available hotels, flights, and activities.
       - If the suggested hotel or activity does not exist in reality, replace it with a valid alternative.
       - Provide a creative, real vacation title.
@@ -67,7 +72,7 @@ export const createVacation = async (
           travelPreferences.travelMethod === "Fly" &&
           `
           "flights": {
-            "from": "Departure City",
+            "from": "${profile.city}, ${profile.state}",
             "to": "Destination City",
             "roundTripCost": <Round trip flight cost as a number>,
             "taxes": <Taxes on flights as a number>,
@@ -78,6 +83,7 @@ export const createVacation = async (
           travelPreferences.travelMethod === "Drive" &&
           `
           "driving": {
+            "startingLocation": "${profile.city}, ${profile.state}",
             "distance": <total miles from user's location to the destination city>,
             "fuelCost": <total fuel cost>,
             "gasPricePerGallon": 3.00
@@ -150,6 +156,7 @@ export const createVacation = async (
     if (travelPreferences.travelMethod === "Drive") {
       totalTravelCost = Number(suggestion.driving.fuelCost);
       drivingDetails = {
+        startingLocation: String(suggestion.driving.startingLocation),
         distance: Number(suggestion.driving.distance),
         fuelCost: Number(suggestion.driving.fuelCost),
         gasPricePerGallon: Number(suggestion.driving.gasPricePerGallon),
