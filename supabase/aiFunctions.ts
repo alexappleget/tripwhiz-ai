@@ -37,7 +37,7 @@ export const createVacation = async (
         profile.interests
       }. Do not focus solely on one interest—create a well-balanced vacation that includes a mix of them.
       - Foods: ${profile.foods}
-      - Location: Austin, TX
+      - Location: ${profile.city}, ${profile.state}
 
       Travel Preferences:
       - Budget: ${travelPreferences.budget}
