@@ -60,12 +60,16 @@ export const updateUserProfile = async ({
   display_name,
   interests,
   foods,
+  city,
+  state,
   onboarding_complete,
 }: {
   age: number;
   display_name: string;
   interests: string;
   foods: string[];
+  city: string;
+  state: string;
   onboarding_complete: boolean;
 }) => {
   try {
@@ -85,6 +89,8 @@ export const updateUserProfile = async ({
         display_name,
         interests,
         foods,
+        city,
+        state,
         onboarding_complete,
       })
       .eq("id", session.user.id)

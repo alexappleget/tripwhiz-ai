@@ -9,7 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/Card/card";
-import { ChevronLeft, ChevronRight, Plane } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsUpDown,
+  Plane,
+} from "lucide-react";
 import {
   Form,
   FormControl,
@@ -32,6 +38,21 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/Textarea/textarea";
 import { MultiSelect } from "@/components/MultiSelect/multi-select";
+import { foodOptions, states } from "./formValues";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/Popover/popover";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/Command/command";
 
 const stepOneSchema = z.object({});
 
@@ -57,6 +78,15 @@ const stepFourSchema = z.object({
   }),
 });
 
+const stepFiveSchema = z.object({
+  city: z.string().min(3, {
+    message: "Please enter your city.",
+  }),
+  state: z.string({
+    message: "Please select your state",
+  }),
+});
+
 // Combined schema for the entire form
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const FormSchema = z.object({
@@ -72,6 +102,12 @@ const FormSchema = z.object({
   }),
   foods: z.array(z.string()).min(1, {
     message: "Please choose at least 1 food option.",
+  }),
+  city: z.string().min(3, {
+    message: "Please enter your city.",
+  }),
+  state: z.string({
+    message: "Please select your state",
   }),
 });
 
@@ -104,18 +140,12 @@ const steps: Step[] = [
     description: "Tell me about what types of food you enjoy eating.",
     schema: stepFourSchema,
   },
-];
-
-const foodOptions = [
-  { value: "american", label: "American" },
-  { value: "chinese", label: "Chinese" },
-  { value: "french", label: "French" },
-  { value: "indian", label: "Indian" },
-  { value: "italian", label: "Italian" },
-  { value: "japanese", label: "Japanese" },
-  { value: "korean", label: "Korean" },
-  { value: "mexican", label: "Mexican" },
-  { value: "thai", label: "Thai" },
+  {
+    title: "Your location",
+    description:
+      "Provide your city and state so we know where you'll be traveling from.",
+    schema: stepFiveSchema,
+  },
 ];
 
 export default function OnboardingPage() {
@@ -143,6 +173,7 @@ const Onboarding = () => {
       age: 0,
       interests: "",
       foods: [],
+      city: "",
     },
   });
 
@@ -155,6 +186,8 @@ const Onboarding = () => {
       form.setValue("age", response.age);
       form.setValue("interests", response.interests);
       form.setValue("foods", response.foods);
+      form.setValue("city", response.city);
+      form.setValue("state", response.state);
     };
 
     fetchUserProfile();
@@ -182,6 +215,8 @@ const Onboarding = () => {
           display_name: formData.name,
           interests: formData.interests,
           foods: formData.foods || [],
+          city: formData.city,
+          state: formData.state,
           onboarding_complete: true,
         });
 
@@ -307,6 +342,87 @@ const Onboarding = () => {
                               />
                             )}
                           />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+                {currentStep === 4 && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City:</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value || ""}
+                              className="w-52"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col mt-4">
+                          <FormLabel>State:</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className={cn(
+                                    "w-52 justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? states.find(
+                                        (state) => state.value === field.value
+                                      )?.label
+                                    : "Select state"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[200px] p-0">
+                              <Command>
+                                <CommandInput placeholder="Search state..." />
+                                <CommandList>
+                                  <CommandEmpty>No state found.</CommandEmpty>
+                                  <CommandGroup>
+                                    {states.map((state) => (
+                                      <CommandItem
+                                        value={state.label}
+                                        key={state.value}
+                                        onSelect={() => {
+                                          form.setValue("state", state.value);
+                                        }}
+                                      >
+                                        {state.label}
+                                        <Check
+                                          className={cn(
+                                            "ml-auto",
+                                            state.value === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
