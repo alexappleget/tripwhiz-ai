@@ -19,14 +19,42 @@ export const createVacation = async (
     throw new Error("No profile was found.");
   }
 
-  const travelMethodInstructions = () => {
-    if (travelPreferences.travelMethod === "Fly") {
-      return "- Find real round-trip flights for the given budget. Provide the total cost including taxes.";
-    }
-    if (travelPreferences.travelMethod === "Drive") {
-      return "- Calculate the total driving cost based on gas mileage. Assume an average fuel economy of 25 miles per gallon and a gas price of $3.00 per gallon. Provide the estimated fuel cost and total driving distance.";
-    }
-  };
+  let travelInstructions = "";
+
+  switch (travelPreferences.travelMethod) {
+    case "Fly":
+      travelInstructions = `- Find real round-trip flights for the given budget. Provide the total cost including taxes.`;
+    case "Drive":
+      travelInstructions = `- Calculate the total driving cost based on gas mileage. Assume an average fuel economy of 25 miles per gallon and a gas price of $3.00 per gallon. Provide the estimated fuel cost and total driving distance.`;
+  }
+
+  let travelDetails = "";
+
+  switch (travelPreferences.travelMethod) {
+    case "Fly":
+      travelDetails = `
+        "flights": {
+          "from": "${profile.city}, ${profile.state}",
+          "to": "Destination City",
+          "roundTripCost": <Round trip flight cost as a number>,
+          "taxes": <Taxes on flights as a number>,
+          "totalFlightCost": <Total flight cost including taxes as a number>
+        },`;
+      break;
+
+    case "Drive":
+      travelDetails = `
+        "driving": {
+          "startingLocation": "${profile.city}, ${profile.state}",
+          "distance": <total miles from user's location to the destination city>,
+          "fuelCost": <total fuel cost>,
+          "gasPricePerGallon": 3
+        },`;
+      break;
+
+    default:
+      travelDetails = "";
+  }
 
   try {
     const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan with real-world, verifiable options only. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, itinerary, bestTravelDates, and a brief description. Surprise the user with unique experiences they might not expect but still align with their preferences.
@@ -53,7 +81,7 @@ export const createVacation = async (
 
       Ensure:
       - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events.
-      - ${travelMethodInstructions}
+      - ${travelInstructions}.
       - All travel plans, whether flights or driving, MUST use ${
         profile.city
       }, ${profile.state} as the starting location.
@@ -68,29 +96,7 @@ export const createVacation = async (
       {
         "title": "Your vacation title here",
         "totalPrice": I will handle this calculation,
-        ${
-          travelPreferences.travelMethod === "Fly"
-            ? `
-          "flights": {
-            "from": "${profile.city}, ${profile.state}",
-            "to": "Destination City",
-            "roundTripCost": <Round trip flight cost as a number>,
-            "taxes": <Taxes on flights as a number>,
-            "totalFlightCost": <Total flight cost including taxes as a number>,
-          },`
-            : ""
-        }
-        ${
-          travelPreferences.travelMethod === "Drive"
-            ? `
-          "driving": {
-            "startingLocation": "${profile.city}, ${profile.state}",
-            "distance": <total miles from user's location to the destination city>,
-            "fuelCost": <total fuel cost>,
-            "gasPricePerGallon": 3,
-          },`
-            : ""
-        }
+        ${travelDetails}
         "hotels": {
           "name": "Hotel name",
           "location": "Hotel address with it's zipcode",
