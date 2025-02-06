@@ -79,6 +79,9 @@ const stepFourSchema = z.object({
 });
 
 const stepFiveSchema = z.object({
+  address: z.string().min(5, {
+    message: "Please provide your full address.",
+  }),
   city: z.string().min(3, {
     message: "Please enter your city.",
   }),
@@ -102,6 +105,9 @@ const FormSchema = z.object({
   }),
   foods: z.array(z.string()).min(1, {
     message: "Please choose at least 1 food option.",
+  }),
+  address: z.string().min(5, {
+    message: "Please provide your full address.",
   }),
   city: z.string().min(3, {
     message: "Please enter your city.",
@@ -143,7 +149,7 @@ const steps: Step[] = [
   {
     title: "Your location",
     description:
-      "Provide your city and state so we know where you'll be traveling from.",
+      "Provide your address, city and state so I know where you'll be traveling from.",
     schema: stepFiveSchema,
   },
 ];
@@ -173,6 +179,7 @@ const Onboarding = () => {
       age: 0,
       interests: "",
       foods: [],
+      address: "",
       city: "",
     },
   });
@@ -186,6 +193,7 @@ const Onboarding = () => {
       form.setValue("age", response.age);
       form.setValue("interests", response.interests);
       form.setValue("foods", response.foods);
+      form.setValue("address", response.address);
       form.setValue("city", response.city);
       form.setValue("state", response.state);
     };
@@ -215,6 +223,7 @@ const Onboarding = () => {
           display_name: formData.name,
           interests: formData.interests,
           foods: formData.foods || [],
+          address: formData.address,
           city: formData.city,
           state: formData.state,
           onboarding_complete: true,
@@ -351,81 +360,99 @@ const Onboarding = () => {
                   <>
                     <FormField
                       control={form.control}
-                      name="city"
+                      name="address"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City:</FormLabel>
+                        <FormItem className="flex flex-col mb-2 w-full">
+                          <FormLabel>Address:</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               value={field.value || ""}
-                              className="w-52"
+                              className="w-full"
                             />
                           </FormControl>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="state"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col mt-4">
-                          <FormLabel>State:</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  className={cn(
-                                    "w-52 justify-between",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value
-                                    ? states.find(
-                                        (state) => state.value === field.value
-                                      )?.label
-                                    : "Select state"}
-                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[200px] p-0">
-                              <Command>
-                                <CommandInput placeholder="Search state..." />
-                                <CommandList>
-                                  <CommandEmpty>No state found.</CommandEmpty>
-                                  <CommandGroup>
-                                    {states.map((state) => (
-                                      <CommandItem
-                                        value={state.label}
-                                        key={state.value}
-                                        onSelect={() => {
-                                          form.setValue("state", state.value);
-                                        }}
-                                      >
-                                        {state.label}
-                                        <Check
-                                          className={cn(
-                                            "ml-auto",
-                                            state.value === field.value
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="flex gap-2 items-center py-2">
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col w-1/2">
+                            <FormLabel>City:</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                value={field.value || ""}
+                                className="w-full"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col w-1/2">
+                            <FormLabel>State:</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className={cn(
+                                      "w-full justify-between",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value
+                                      ? states.find(
+                                          (state) => state.value === field.value
+                                        )?.label
+                                      : "Select state"}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-52 p-0">
+                                <Command>
+                                  <CommandInput placeholder="Search state..." />
+                                  <CommandList>
+                                    <CommandEmpty>No state found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {states.map((state) => (
+                                        <CommandItem
+                                          value={state.label}
+                                          key={state.value}
+                                          onSelect={() => {
+                                            form.setValue("state", state.value);
+                                          }}
+                                        >
+                                          {state.label}
+                                          <Check
+                                            className={cn(
+                                              "ml-auto",
+                                              state.value === field.value
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                            )}
+                                          />
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </>
                 )}
               </CardContent>

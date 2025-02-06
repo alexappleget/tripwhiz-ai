@@ -60,6 +60,7 @@ export const updateUserProfile = async ({
   display_name,
   interests,
   foods,
+  address,
   city,
   state,
   onboarding_complete,
@@ -68,6 +69,7 @@ export const updateUserProfile = async ({
   display_name: string;
   interests: string;
   foods: string[];
+  address: string;
   city: string;
   state: string;
   onboarding_complete: boolean;
@@ -89,6 +91,7 @@ export const updateUserProfile = async ({
         display_name,
         interests,
         foods,
+        address,
         city,
         state,
         onboarding_complete,

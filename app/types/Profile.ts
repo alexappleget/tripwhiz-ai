@@ -2,8 +2,9 @@ export interface Profile {
   id: string;
   age: number;
   display_name: string;
-  interests: string[];
+  interests: string;
   foods: string[];
+  address: string;
   city: string;
   state: string;
   created_at: string;
