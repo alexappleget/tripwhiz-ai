@@ -86,8 +86,7 @@ export default function CreateVacation() {
     }
     try {
       const id = await createVacation(profile, travelPreferences);
-      console.log(id);
-      // router.push(`/vacations/${id}`);
+      router.push(`/vacations/${id}`);
     } catch (error) {
       throw error;
     }

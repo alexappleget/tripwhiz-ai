@@ -30,46 +30,14 @@ export const createVacation = async (
       break;
   }
 
-  let travelDetails = "";
-
-  switch (travelPreferences.travelMethod) {
-    case "Fly":
-      travelDetails = `
-        "flights": {
-          "from": "${profile.city}, ${profile.state}",
-          "to": "Destination City",
-          "roundTripCost": <Round trip flight cost as a number>,
-          "taxes": <Taxes on flights as a number>,
-          "totalFlightCost": <Total flight cost including taxes as a number>
-        },`;
-      break;
-
-    case "Drive":
-      travelDetails = `
-        "driving": {
-          "startingLocation": "${profile.address} ${profile.city}, ${profile.state}",
-          "distance": <total miles from user's startingLocation to the destination city>,
-          "fuelCost": <total fuel cost>,
-          "gasPricePerGallon": 3
-        },`;
-      break;
-
-    default:
-      travelDetails = "";
-  }
-
   try {
     const prompt = `Act as a vacation travel planner. Based on the profile information and travel preferences provided, create a detailed vacation plan with real-world, verifiable options only. Ensure the output is in JSON format with keys: title, totalPrice, flights, hotels, itinerary, bestTravelDates, and a brief description. Surprise the user with unique experiences they might not expect but still align with their preferences.
 
       Profile Information:
       - Age: ${profile.age}
-      - Interests: ${
-        profile.interests
-      }. Do not focus solely on one interest—create a well-balanced vacation that includes a mix of them.
+      - Interests: ${profile.interests}. Do not focus solely on one interest—create a well-balanced vacation that includes a mix of them.
       - Foods: ${profile.foods}
-      - Departure Location (MUST be used for all travel calculations): ${
-        profile.address
-      } ${profile.city}, ${profile.state}
+      - Departure Location (MUST be used for all travel calculations): ${profile.address} ${profile.city}, ${profile.state}
 
       Travel Preferences:
       - Budget: ${travelPreferences.budget}
@@ -84,51 +52,45 @@ export const createVacation = async (
       Ensure:
       - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events.
       - ${travelInstructions}.
-      - All travel plans, whether flights or driving, MUST use ${
-        profile.address
-      } ${profile.city}, ${profile.state} as the starting location.
+      - All travel plans, whether flights or driving, MUST use ${profile.address} ${profile.city}, ${profile.state} as the starting location.
       - Only use real and available hotels, flights, and activities.
       - If the suggested hotel or activity does not exist in reality, replace it with a valid alternative.
       - Provide a creative, real vacation title.
       - Include real cost estimates for flights and hotels from reputable sources.
       - Add a brief description explaining why this vacation was chosen, particularly how it aligns with the user’s preferences and budget.
 
-      Ensure the final result is structured as:
+      Your response must be a single valid JSON object with the following structure:
+      1. "title": String - creative vacation title
+      2. If travel method is "Fly", include "flights" object with: 
+        - "from": String - departure city/state
+        - "to": String - destination city
+        - "roundTripCost": Number - base cost
+        - "taxes": Number - taxes and fees
+        - "totalFlightCost": Number - total flight cost
+      3. If travel method is "Drive", include "driving" object with:
+        - "startingLocation": String - starting address
+        - "distance": Number - total miles
+        - "fuelCost": Number - estimated fuel cost
+        - "gasPricePerGallon": Number - gas price (use 3.00)
+      4. "hotels" object with:
+        - "name": String - hotel name
+        - "location": String - full address with zip code
+        - "phoneNumber": String - contact number
+        - "nightlyPrice": Number - cost per night
+        - "taxes": Number - taxes and fees
+        - "totalStayCost": Number - total accommodation cost
+      5. "itinerary": Array of day objects, each containing:
+        - "day": Number - day number (1, 2, etc)
+        - "description": String - detailed day activities
+        - "estimatedActivityCost": Number - activity costs
+        - "estimatedTravelCost": Number - local travel costs
+      6. "bestTravelDates" object with:
+        - "start": String - start date
+        - "end": String - end date
+        - "reason": String - reason for date selection
+      7. "vacationDescription": String - overall trip description
 
-      {
-        "title": "Your vacation title here",
-        "totalPrice": I will handle this calculation,
-        ${travelDetails}
-        "hotels": {
-          "name": "Hotel name",
-          "location": "Hotel address with it's zipcode",
-          "phoneNumber": "Phone number for the hotel",
-          "nightlyPrice": <Nightly cost here as a number>,
-          "taxes": <Taxes on hotel as a number>,
-          "totalStayCost": <Total hotel cost including taxes as a number>,
-        },
-        "itinerary": [
-          ${Array.from(
-            { length: travelPreferences.numberOfDays ?? 0 },
-            (_, i) => {
-              return `{
-              "day": ${i + 1},
-              "description": "Description of activities for day ${i + 1}",
-              "estimatedActivityCost": <Cost estimate for day ${
-                i + 1
-              }'s activity>,
-              "estimatedTravelCost": <Cost estimate for traveling from the hotel's address to the activity>,
-              }`;
-            }
-          ).join(",\n")}
-        ],
-        "bestTravelDates": {
-          "start": "Suggested start date",
-          "end": "Suggested end date",
-          "reason": "A brief description of why these dates were chosen.",
-        },
-        "vacationDescription": "A brief description of why this vacation was chosen.",
-      }
+      Make sure all numerical values are actual numbers (not strings) and ensure the JSON is properly formatted with no syntax errors.
     `;
 
     const completion = await openai.chat.completions.create({
@@ -220,7 +182,7 @@ export const createVacation = async (
       vacationDescription: String(suggestion.vacationDescription),
     };
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("vacation_suggestions")
       .insert({
         profile_id: profile.id,
@@ -233,7 +195,7 @@ export const createVacation = async (
       throw new Error("Failed to store the vacation:", error);
     }
 
-    return cleanSuggestion;
+    return data.id;
   } catch (error) {
     throw error;
   }
