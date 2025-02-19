@@ -220,7 +220,7 @@ export const createVacation = async (
       vacationDescription: String(suggestion.vacationDescription),
     };
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("vacation_suggestions")
       .insert({
         profile_id: profile.id,
