@@ -24,8 +24,10 @@ export const createVacation = async (
   switch (travelPreferences.travelMethod) {
     case "Fly":
       travelInstructions = `- Find real round-trip flights for the given budget. Provide the total cost including taxes.`;
+      break;
     case "Drive":
       travelInstructions = `- Calculate the total driving cost based on gas mileage. Assume an average fuel economy of 25 miles per gallon and a gas price of $3.00 per gallon. Provide the estimated fuel cost and total driving distance.`;
+      break;
   }
 
   let travelDetails = "";
@@ -45,8 +47,8 @@ export const createVacation = async (
     case "Drive":
       travelDetails = `
         "driving": {
-          "startingLocation": "${profile.city}, ${profile.state}",
-          "distance": <total miles from user's location to the destination city>,
+          "startingLocation": "${profile.address} ${profile.city}, ${profile.state}",
+          "distance": <total miles from user's startingLocation to the destination city>,
           "fuelCost": <total fuel cost>,
           "gasPricePerGallon": 3
         },`;
@@ -66,8 +68,8 @@ export const createVacation = async (
       }. Do not focus solely on one interest—create a well-balanced vacation that includes a mix of them.
       - Foods: ${profile.foods}
       - Departure Location (MUST be used for all travel calculations): ${
-        profile.city
-      }, ${profile.state}
+        profile.address
+      } ${profile.city}, ${profile.state}
 
       Travel Preferences:
       - Budget: ${travelPreferences.budget}
@@ -83,8 +85,8 @@ export const createVacation = async (
       - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events.
       - ${travelInstructions}.
       - All travel plans, whether flights or driving, MUST use ${
-        profile.city
-      }, ${profile.state} as the starting location.
+        profile.address
+      } ${profile.city}, ${profile.state} as the starting location.
       - Only use real and available hotels, flights, and activities.
       - If the suggested hotel or activity does not exist in reality, replace it with a valid alternative.
       - Provide a creative, real vacation title.
@@ -231,7 +233,7 @@ export const createVacation = async (
       throw new Error("Failed to store the vacation:", error);
     }
 
-    return data.id;
+    return cleanSuggestion;
   } catch (error) {
     throw error;
   }

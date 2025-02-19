@@ -29,7 +29,7 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="relative min-h-screen w-full">
       <video
         autoPlay
         loop
@@ -41,7 +41,7 @@ export default function Home() {
         Your browser does not support the video tag.
       </video>
 
-      <div className="relative z-10 flex flex-col items-center justify-center h-full bg-black/50">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen bg-black/50 pb-10">
         <section className="relative z-10 py-16 px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Plan Your Dream Vacation?
