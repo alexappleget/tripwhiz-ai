@@ -261,10 +261,12 @@ const Onboarding = () => {
               <CardContent>
                 {currentStep === 0 && (
                   <>
-                    <div className="w-fit p-3 rounded-full mx-auto mb-4">
+                    <div className="w-fit p-3 rounded-full mx-auto">
                       <Plane />
                     </div>
-                    <h3 className="font-bold text-center">Hello, {name}!</h3>
+                    <h3 className="font-bold text-center mb-2">
+                      Hello, {name}!
+                    </h3>
                     <p className="text-center">
                       Our travel planner AI is designed to make planning your
                       next vacation effortless! In just minutes, our advanced

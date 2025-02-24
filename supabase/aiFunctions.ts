@@ -19,6 +19,8 @@ export const createVacation = async (
     throw new Error("No profile was found.");
   }
 
+  const currentYear = new Date().getFullYear();
+
   let travelInstructions = "";
 
   switch (travelPreferences.travelMethod) {
@@ -50,7 +52,7 @@ export const createVacation = async (
       - Destination?: ${travelPreferences.destination}
 
       Ensure:
-      - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events.
+      - Choose the best dates for the vacation based on the budget. For lower budgets, consider off-peak seasons or promotions. For higher budgets, consider peak seasons and special events. The current year is: ${currentYear}.
       - ${travelInstructions}.
       - All travel plans, whether flights or driving, MUST use ${profile.address} ${profile.city}, ${profile.state} as the starting location.
       - Only use real and available hotels, flights, and activities.
