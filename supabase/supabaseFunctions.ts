@@ -2,7 +2,7 @@
 
 import { createClient } from "./server";
 
-export const getVacation = async ({ id }: { id: string }) => {
+export const getAllUserVacations = async () => {
   try {
     const supabase = await createClient();
     const {
@@ -10,6 +10,32 @@ export const getVacation = async ({ id }: { id: string }) => {
     } = await supabase.auth.getSession();
 
     if (!session) {
+      throw new Error("Unauthorized");
+    }
+
+    const { data } = await supabase
+      .from("vacation_suggestions")
+      .select()
+      .eq("profile_id", session.user.id);
+
+    if (!data) {
+      throw new Error("Failed to fetch data.");
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getCurrentVacation = async ({ id }: { id: string }) => {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
       throw new Error("Unauthorized");
     }
 

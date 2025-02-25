@@ -1,7 +1,7 @@
 "use client";
 
 import { VacationSuggestion } from "@/app/types/aiFunctionTypes";
-import { getVacation } from "@/supabase/supabaseFunctions";
+import { getCurrentVacation } from "@/supabase/supabaseFunctions";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { vacationDataDefault } from "./vacationDataDefault";
@@ -25,8 +25,7 @@ export default function Vacations() {
     const grabVacation = async () => {
       setLoadingData(true);
       try {
-        const data = await getVacation({ id });
-        console.log(data);
+        const data = await getCurrentVacation({ id });
         setVacationData(data);
       } catch (error) {
         throw error;

@@ -39,6 +39,13 @@ export interface VacationSuggestion {
   vacationDescription: string;
 }
 
+export interface UserVacation {
+  id: string;
+  profile_id: string;
+  created_at: string;
+  suggestion: VacationSuggestion;
+}
+
 export interface DrivingDetails {
   startingLocation: string;
   distance: number;
