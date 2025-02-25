@@ -32,14 +32,18 @@ export default function Dashboard() {
         <h2 className="font-semibold text-lg mb-2">My Groups</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {vacations.map((vacation) => (
-            <div key={vacation.id} className="border-2 rounded-lg p-6">
+            <Link
+              key={vacation.id}
+              href={`/vacations/${vacation.id}`}
+              className="border-2 rounded-lg p-6 mt-10"
+            >
               <h2>{vacation.suggestion.title}</h2>
               <p>
                 {vacation.suggestion.bestTravelDates.start} -{" "}
                 {vacation.suggestion.bestTravelDates.end}
               </p>
               <p>Total Price: ${vacation.suggestion.totalPrice}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
