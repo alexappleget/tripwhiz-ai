@@ -46,7 +46,6 @@ export const createVacation = async (
       - Travel Month: ${travelPreferences.travelMonth}
       - Climate Preference: ${travelPreferences.climatePreference}
       - Travel Method: ${travelPreferences.travelMethod}
-      - Number of Travelers: ${travelPreferences.numberOfTravelers}
       - Trip Style: ${travelPreferences.tripStyle}
       - Number of Days: ${travelPreferences.numberOfDays}
       - Destination?: ${travelPreferences.destination}

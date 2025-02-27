@@ -39,9 +39,6 @@ const formSchema = z.object({
     message:
       "Please specify whether you would like to drive or take a flight to your destination.",
   }),
-  numberOfTravelers: z.coerce.number().min(1, {
-    message: "Please provide how many travelers there will be.",
-  }),
   tripStyle: z.enum(["Adventurous", "Cultural", "Luxury", "Relaxing"], {
     message: "Please specify your trip style.",
   }),
@@ -64,7 +61,6 @@ export default function CreateVacation() {
       budget: undefined,
       climatePreference: undefined,
       travelMethod: undefined,
-      numberOfTravelers: 0,
       tripStyle: undefined,
       numberOfDays: 0,
       travelMonth: "",
@@ -201,26 +197,6 @@ export default function CreateVacation() {
                           <FormLabel>Fly</FormLabel>
                         </FormItem>
                       </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Number of Travelers */}
-              <FormField
-                control={form.control}
-                name="numberOfTravelers"
-                render={({ field }) => (
-                  <FormItem className="m-5">
-                    <FormLabel>Number of Travelers:</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-4/5"
-                        {...field}
-                        type="number"
-                        value={field.value ?? ""}
-                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
