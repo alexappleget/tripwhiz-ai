@@ -29,7 +29,7 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black/50">
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <section className="relative z-10 py-16 px-4 text-center">
         <h2 className="text-3xl font-bold text-white mb-4">
           Ready to Plan Your Dream Vacation?

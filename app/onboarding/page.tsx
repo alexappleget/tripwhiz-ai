@@ -241,7 +241,7 @@ const Onboarding = () => {
   };
 
   return (
-    <main className="w-full min-h-screen flex flex-col items-center justify-center">
+    <main className="w-full h-full flex flex-col items-center justify-center pt-20">
       <div className="max-w-lg">
         <Progress
           value={isSubmitted ? 100 : (currentStep / steps.length) * 100}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ProfileHeader } from "@/components/ProfileHeader/ProfileHeader";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-black/20">
+        <ProfileHeader />
+        {children}
+      </body>
     </html>
   );
 }

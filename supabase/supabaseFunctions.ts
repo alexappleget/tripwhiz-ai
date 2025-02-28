@@ -135,3 +135,22 @@ export const updateUserProfile = async ({
     throw error;
   }
 };
+
+export const getUserAvatar = async () => {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("No user found");
+    }
+
+    const userAvatarUrl = user.user_metadata.avatar_url;
+
+    return userAvatarUrl;
+  } catch (error) {
+    throw error;
+  }
+};
