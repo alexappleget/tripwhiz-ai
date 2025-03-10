@@ -2,10 +2,14 @@ import { PopoverTrigger } from "@radix-ui/react-popover";
 import { Popover, PopoverContent } from "../Popover/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import Link from "next/link";
+import { LogoutButton } from "../LogoutButton/LogoutButton";
+import { useState } from "react";
 
 export const UserAvatar = ({ src }: { src: string }) => {
+  const [open, setOpen] = useState<boolean>(false);
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Avatar className="hover:cursor-pointer">
           <AvatarImage src={src} alt="Your avatar photo for your profile" />
@@ -30,7 +34,7 @@ export const UserAvatar = ({ src }: { src: string }) => {
               <Link href="">asdf</Link>
             </div>
             <div className="grid grid-cols-3 items-center gap-4 hover:underline">
-              <Link href="">Logout</Link>
+              <LogoutButton setOpen={setOpen} />
             </div>
           </div>
         </div>
