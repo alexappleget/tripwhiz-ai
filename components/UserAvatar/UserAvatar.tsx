@@ -17,26 +17,21 @@ export const UserAvatar = ({ src }: { src: string }) => {
         </Avatar>
       </PopoverTrigger>
       <PopoverContent className="w-52">
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <Link href="" className="font-medium leading-none hover:underline">
-              View Profile
-            </Link>
-          </div>
-          <div className="grid gap-2">
-            <div className="grid grid-cols-3 items-center gap-4 hover:underline">
-              <Link href="">Edit Profile</Link>
-            </div>
-            <div className="grid grid-cols-3 items-center gap-4 hover:underline">
-              <Link href="">asdf</Link>
-            </div>
-            <div className="grid grid-cols-3 items-center gap-4 hover:underline">
-              <Link href="">asdf</Link>
-            </div>
-            <div className="grid grid-cols-3 items-center gap-4 hover:underline">
-              <LogoutButton setOpen={setOpen} />
-            </div>
-          </div>
+        <div className="flex flex-col gap-2">
+          <Link href="" className="hover:underline">
+            View Profile
+          </Link>
+          <Link
+            href="/onboarding"
+            onClick={() => setOpen(false)}
+            className="hover:underline"
+          >
+            Edit Profile
+          </Link>
+          <Link href="" className="hover:underline">
+            Settings
+          </Link>
+          <LogoutButton setOpen={setOpen} />
         </div>
       </PopoverContent>
     </Popover>

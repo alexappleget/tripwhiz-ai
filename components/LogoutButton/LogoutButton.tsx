@@ -1,8 +1,8 @@
 "use client";
 
 import { createClient } from "@/supabase/client";
-import { useRouter } from "next/navigation";
 import { Button } from "../Button/button";
+import { useRouter } from "next/navigation";
 
 export const LogoutButton = ({
   setOpen,
@@ -22,5 +22,9 @@ export const LogoutButton = ({
     }
   };
 
-  return <Button onClick={handleLogOut}>Log Out</Button>;
+  return (
+    <Button onClick={handleLogOut} className="hover:underline">
+      Log Out
+    </Button>
+  );
 };
